@@ -4,6 +4,12 @@
 
 using namespace std;
 
+enum round_outcome {
+    CORRECT,
+    WRONG,
+    DOUBLE
+};
+
 class RideTheBus
 {
 public:
@@ -26,19 +32,19 @@ public:
                     cout << "Player " << player + 1 << "'s turn." << endl;
                     if (stage == 0)
                     {
-                        handle_round_1(hands, player);
+                        player_round_success[player][0] = handle_round_1(hands, player);
                     }
                     if (stage == 1)
                     {
-                        handle_round_2(hands, player);
+                        player_round_success[player][1] = handle_round_2(hands, player);
                     }
                     if (stage == 2)
                     {
-                        handle_round_3(hands, player);
+                        player_round_success[player][2] = handle_round_3(hands, player);
                     }
                     if (stage == 3)
                     {
-                        handle_round_4(hands, player);
+                        player_round_success[player][3] = handle_round_4(hands, player);
                     }
                 }
             }
@@ -48,7 +54,8 @@ public:
             cin >> yn;
             if (yn == "n")
             {
-                play_again = false;;
+                play_again = false;
+                ;
             }
         }
     }
@@ -57,14 +64,18 @@ public:
     {
         this->numPlayers = players;
         hands = new Card *[players];
-        player_round_success = new bool *[players];
+        player_round_success = new round_outcome *[players];
+
         for (int p = 0; p < players; p++)
         {
             hands[p] = new Card[4];
-            player_round_success[p] = new bool[4];
+            player_round_success[p] = new round_outcome[4];
         }
 
         deck.shuffle();
+
+        hands = deck.deal_hands(numPlayers, 4);
+
         game_in_progress = false;
         play_again = true;
     }
@@ -75,7 +86,7 @@ private:
     Deck deck;
     Card **hands;
 
-    bool **player_round_success;
+    round_outcome **player_round_success;
 
     bool game_in_progress;
     bool play_again;
@@ -142,13 +153,13 @@ private:
         return val - '0';
     }
 
-    bool handle_round_1(Card **hands, int player)
+    round_outcome handle_round_1(Card **hands, int player)
     {
         string choice;
         bool flag = true;
         while (flag)
         {
-            cout << "Red or black? (r/b)";
+            cout << "Red or black? (r/b): ";
             cin >> choice;
             if (choice != "r" && choice != "b")
                 cout << "bad answer, try again!" << endl;
@@ -167,24 +178,26 @@ private:
         if (color == choice)
         {
             cout << "Correct!" << endl;
-            cout << "The card was: " << format_card(hands[player][0]) << endl;
-            return true;
+            cout << "The card was: " << format_card(hands[player][0]) << endl
+                 << endl;
+            return CORRECT;
         }
         else
         {
             cout << "WRONG! Take a drink" << endl;
-            cout << "The card was: " << format_card(hands[player][0]) << endl;
-            return false;
+            cout << "The card was: " << format_card(hands[player][0]) << endl
+                 << endl;
+            return WRONG;
         }
     }
 
-    bool handle_round_2(Card **hands, int player)
+    round_outcome handle_round_2(Card **hands, int player)
     {
         string choice;
         bool flag = true;
         while (flag)
         {
-            cout << "Higher or lower? (h/l)";
+            cout << "Higher or lower? (h/l): ";
             cin >> choice;
             if (choice != "h" && choice != "l")
                 cout << "bad answer, try again!" << endl;
@@ -197,26 +210,31 @@ private:
         if (choice == "h" && newCardVal > oldCardVal || choice == "l" && newCardVal < oldCardVal)
         {
             cout << "Correct!" << endl;
-            cout << "The card was: " << format_card(hands[player][1]) << endl;
-            return true;
+            cout << "The card was: " << format_card(hands[player][1]) << endl
+                 << endl;
+            return CORRECT;
         }
         else if (newCardVal == oldCardVal)
         {
             cout << "Ouch! Double drink!" << endl;
+            cout << "The card was: " << format_card(hands[player][1]) << endl
+             << endl;
+            return DOUBLE;
         }
         else
             cout << "WRONG! Drink up!" << endl;
-        cout << "The card was: " << format_card(hands[player][1]) << endl;
-        return false;
+        cout << "The card was: " << format_card(hands[player][1]) << endl
+             << endl;
+        return WRONG;
     }
 
-    bool handle_round_3(Card **hands, int player)
+    round_outcome handle_round_3(Card **hands, int player)
     {
         string choice;
         bool flag = true;
         while (flag)
         {
-            cout << "Inside or Outside? (i/o)";
+            cout << "Inside or Outside? (i/o): ";
             cin >> choice;
             if (choice != "i" && choice != "o")
                 cout << "bad answer, try again!" << endl;
@@ -231,7 +249,7 @@ private:
         {
             cout << "Ouch! Double drink!" << endl;
             cout << "The card was: " << format_card(hands[player][2]) << endl;
-            return false;
+            return DOUBLE;
         }
 
         bool outside = (cardThreeVal > cardOneVal && cardThreeVal > cardTwoVal || cardThreeVal < cardOneVal && cardThreeVal < cardTwoVal);
@@ -239,21 +257,23 @@ private:
         if (outside && choice == "o" || !outside && choice == "i")
         {
             cout << "Correct!" << endl;
-            cout << "The card was: " << format_card(hands[player][2]) << endl;
-            return true;
+            cout << "The card was: " << format_card(hands[player][2]) << endl
+                 << endl;
+            return CORRECT;
         }
         cout << "WRONG! Drink up!" << endl;
-        cout << "The card was: " << format_card(hands[player][2]) << endl;
-        return false;
+        cout << "The card was: " << format_card(hands[player][2]) << endl
+             << endl;
+        return WRONG;
     }
 
-    bool handle_round_4(Card **hands, int player)
+    round_outcome handle_round_4(Card **hands, int player)
     {
         string choice;
         bool flag = true;
         while (flag)
         {
-            cout << "Last round. What suit? (h/d/s/c)";
+            cout << "Last round. What suit? (h/d/s/c): ";
             cin >> choice;
             if (choice != "h" && choice != "d" && choice != "s" && choice != "c")
                 cout << "bad answer, try again!" << endl;
@@ -263,11 +283,13 @@ private:
         if (choice[0] == std::tolower(hands[player][3].getSuit()))
         {
             cout << "Correct!" << endl;
-            cout << "The card was: " << format_card(hands[player][3]) << endl;
-            return true;
+            cout << "The card was: " << format_card(hands[player][3]) << endl
+                 << endl;
+            return CORRECT;
         }
         cout << "WRONG! Drink up!" << endl;
-        cout << "The card was: " << format_card(hands[player][3]) << endl;
-        return false;
+        cout << "The card was: " << format_card(hands[player][3]) << endl
+             << endl;
+        return WRONG;
     }
 };
