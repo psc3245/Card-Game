@@ -18,4 +18,8 @@ public:
         this->val = val;
         this->face_up = false;
     }
+
+    Card() {
+        this->face_up = false;
+    }
 };
