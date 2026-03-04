@@ -1,84 +1,23 @@
 #include <iostream>
 #include <ctime>
+#include "Deck.cpp"
 
 using namespace std;
 
-string **deal_hands(string *deck, int hands, int cards_per_hand)
-{
-    if (hands * cards_per_hand > 52)
-    {
-        cerr << "NOT ENOUGH CARDS";
-        return NULL;
-    }
-    string **deal = new string *[hands];
-    int index = 0;
-    for (int i = 0; i < hands; i++)
-    {
-        string *hand = new string[cards_per_hand];
-        for (int j = 0; j < cards_per_hand; j++)
-        {
-            hand[j] = deck[index];
-            index++;
-        }
-        deal[i] = hand;
-    }
-
-    return deal;
-}
-
-void shuffle_deck(string *deck)
-{
-    srand(time(0));
-    int rand_repetitions = std::rand() % 1000;
-    string temp;
-    int a, b;
-    for (int i = 0; i < rand_repetitions; i++)
-    {
-        a = std::rand() % 52;
-        b = std::rand() % 52;
-        temp = deck[a];
-        deck[a] = deck[b];
-        deck[b] = temp;
-    }
-}
-
-string *initialize_deck()
-{
-
-    // H = Hearts, C = Clubs, S = Spades, D = Diamonds
-    string suits[4] = {"H", "C", "S", "D"};
-    // A = Ace, K = King, Q = Queen, J = Jack, T = Ten
-    string values[13] = {"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"};
-
-    string *deck = new string[52];
-
-    int index;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 13; j++)
-        {
-            index = i * 13 + j;
-            deck[index] = values[j] + suits[i];
-        }
-    }
-
-    return deck;
-}
-
-void print_hands(string **hands, int players, int cards)
+void print_hands(Card **hands, int players, int cards)
 {
     for (int i = 0; i < players; i++)
     {
         cout << "Hand " << i + 1 << ": ";
         for (int j = 0; j < cards; j++)
         {
-            cout << hands[i][j] << " ";
+            cout << hands[i][j].getVal() << hands[i][j].getSuit();
         }
         cout << endl;
     }
 }
 
-void print_hands_hiding_some(string **hands, int players, int cards, int show_count)
+void print_hands_hiding_some(Card **hands, int players, int cards, int show_count)
 {
     for (int i = 0; i < players; i++)
     {
@@ -86,7 +25,7 @@ void print_hands_hiding_some(string **hands, int players, int cards, int show_co
         for (int j = 0; j < cards; j++)
         {
             if (j < show_count)
-                cout << hands[i][j] << " ";
+                cout << hands[i][j].getVal() << hands[i][j].getSuit() << " ";
             else
                 cout << " X ";
         }
@@ -94,19 +33,20 @@ void print_hands_hiding_some(string **hands, int players, int cards, int show_co
     }
 }
 
-string format_card(string card)
+string format_card(Card card)
 {
     string suit;
-    if (card[1] == 'H')
+    if (card.getSuit() == 'H')
         suit = "Hearts";
-    if (card[1] == 'D')
+    if (card.getSuit() == 'D')
         suit = "Diamonds";
-    if (card[1] == 'S')
+    if (card.getSuit() == 'S')
         suit = "Spades";
-    if (card[1] == 'C')
+    if (card.getSuit() == 'C')
         suit = "Clubs";
 
-    string result = card.substr(0, 1) + " of " + suit;
+    string strval(1, card.getVal());
+    string result = strval + " of " + suit;
     return result;
 }
 
@@ -120,7 +60,7 @@ int map_hand_value(char val)
     return val - '0';
 }
 
-bool handle_round_1(string **hands, int player)
+bool handle_round_1(Card **hands, int player)
 {
     string choice;
     bool flag = true;
@@ -134,7 +74,7 @@ bool handle_round_1(string **hands, int player)
             flag = false;
     }
     string color;
-    if (hands[player][0][1] == 'H' || hands[player][0][1] == 'D')
+    if (hands[player][0].getSuit() == 'H' || hands[player][0].getSuit() == 'D')
     {
         color = "r";
     }
@@ -156,7 +96,7 @@ bool handle_round_1(string **hands, int player)
     }
 }
 
-bool handle_round_2(string **hands, int player)
+bool handle_round_2(Card **hands, int player)
 {
     string choice;
     bool flag = true;
@@ -169,8 +109,8 @@ bool handle_round_2(string **hands, int player)
         else
             flag = false;
     }
-    int oldCardVal = map_hand_value(hands[player][0][0]);
-    int newCardVal = map_hand_value(hands[player][1][0]);
+    int oldCardVal = map_hand_value(hands[player][0].getVal());
+    int newCardVal = map_hand_value(hands[player][1].getVal());
 
     if (choice == "h" && newCardVal > oldCardVal || choice == "l" && newCardVal < oldCardVal)
     {
@@ -188,7 +128,7 @@ bool handle_round_2(string **hands, int player)
     return false;
 }
 
-bool handle_round_3(string **hands, int player)
+bool handle_round_3(Card **hands, int player)
 {
     string choice;
     bool flag = true;
@@ -201,9 +141,9 @@ bool handle_round_3(string **hands, int player)
         else
             flag = false;
     }
-    int cardOneVal = map_hand_value(hands[player][0][0]);
-    int cardTwoVal = map_hand_value(hands[player][1][0]);
-    int cardThreeVal = map_hand_value(hands[player][2][0]);
+    int cardOneVal = map_hand_value(hands[player][0].getVal());
+    int cardTwoVal = map_hand_value(hands[player][1].getVal());
+    int cardThreeVal = map_hand_value(hands[player][2].getVal());
 
     if (cardThreeVal == cardOneVal || cardThreeVal == cardTwoVal)
     {
@@ -225,7 +165,7 @@ bool handle_round_3(string **hands, int player)
     return false;
 }
 
-bool handle_round_4(string **hands, int player)
+bool handle_round_4(Card **hands, int player)
 {
     string choice;
     bool flag = true;
@@ -238,7 +178,7 @@ bool handle_round_4(string **hands, int player)
         else
             flag = false;
     }
-    if (choice[0] == hands[player][3][1]) {
+    if (choice[0] == std::tolower(hands[player][3].getSuit())) {
         cout << "Correct!" << endl;
         cout << "The card was: " << format_card(hands[player][3]) << endl;
         return true;
@@ -256,12 +196,12 @@ int main()
     bool ended = false;
     while (!ended)
     {
-        string *deck = initialize_deck();
-        shuffle_deck(deck);
+        Deck *deck = new Deck();
+        deck->shuffle();
         cout << "How many players? ";
         int players;
         cin >> players;
-        string **hands = deal_hands(deck, players, 4);
+        Card **hands = deck->deal_hands(players, 4);
         cout << "Let's begin." << endl;
 
         for (int stage = 0; stage < 4; stage++)

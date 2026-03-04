@@ -7,10 +7,25 @@ class Deck
 {
 public:
 
-    Card* deal(int n) {
+    Card** deal_hands(int players, int cards) {
+        if (!is_shuffled || get_cards_remaining() < players * cards) {
+            // What should I do here?
+            // return;
+        }
+        Card** hands = new Card*[players];
+        for (int p = 0; p < players; p++) {
+            hands[p] = new Card[cards];
+            for (int c = 0; c < cards; c++) {
+                hands[p][c] = draw();
+            }
+        }
+        return hands;
+    }
+    
+    Card* deal_hand(int n) {
         if (!is_shuffled || get_cards_remaining() < n) {
             // What should I do here?
-            return;
+            // return;
         }
         Card *cards = new Card[n];
         for (int i = 0; i < n; i++) {
@@ -21,7 +36,7 @@ public:
     Card draw() {
         if (!is_shuffled || get_cards_remaining() < 1) {
             // What should I do here?
-            return;
+            // return;
         }
         Card c = deck.at(0);
         deck.erase(deck.begin());
