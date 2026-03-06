@@ -1,6 +1,10 @@
+CXX = g++
+CXXFLAGS = -std=c++17 -I/opt/homebrew/include
+LDFLAGS = -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system
+
 make:
-	g++ -c main.cpp
-	g++ -o main main.o
+	$(CXX) $(CXXFLAGS) -c main.cpp
+	$(CXX) -o main main.o $(LDFLAGS)
 	rm main.o
 
 clean:
