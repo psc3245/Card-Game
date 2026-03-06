@@ -19,6 +19,8 @@ public:
         i_pos = pos;
         i_color = color;
         i_card = card;
+        this->setPosition(i_pos);
+    this->setFillColor(i_color);
         update();
     }
 
