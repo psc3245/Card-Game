@@ -1,5 +1,6 @@
+#pragma once
 #include <vector>
-#include "Card.cpp"
+#include "Card.h"
 
 using namespace std;
 

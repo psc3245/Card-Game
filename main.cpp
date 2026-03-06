@@ -1,5 +1,6 @@
 #include "RideTheBus.cpp"
 #include <SFML/Graphics.hpp>
+#include "CardShape.cpp"
 
 int main()
 {
@@ -12,13 +13,13 @@ int main()
     header.setFillColor(sf::Color::Black);
     header.setPosition({350.f, 20.f});
 
-    sf::RectangleShape *cards = new sf::RectangleShape[4];
+    CardShape *cards = new CardShape[4];
 
     for (int i = 0; i < 4; i++)
     {
-        sf::RectangleShape card({100.f, 140.f});
-        card.setFillColor(sf::Color::Blue);
-        card.setPosition({285.f + (110.f * i), 570.f});
+        Card c;
+        CardShape card({100.f, 140.f}, {0.f, 0.f}, sf::Color::Blue, c);
+        card.setPos({285.f + (110.f * i), 570.f});
         cards[i] = card;
     }
 
