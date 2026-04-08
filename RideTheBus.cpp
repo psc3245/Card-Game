@@ -81,6 +81,14 @@ public:
         play_again = true;
     }
 
+    Card* getHand(int player) {
+        if (player > this->numPlayers) {
+            cerr << "Out of bounds" << endl;
+            return NULL;
+        }
+        return hands[player - 1];
+    }
+
 private:
     int numPlayers;
 
