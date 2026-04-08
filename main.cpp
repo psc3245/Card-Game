@@ -31,14 +31,14 @@ int main()
                 window.close();
             if (event->is<sf::Event::MouseButtonPressed>())
             {
+                printf("clicked\n");
                 auto mousePos = sf::Mouse::getPosition(window);
                 for (int i = 0; i < 4; i++)
                 {
-                    if (cards[i].getGlobalBounds().contains(sf::Vector2f(mousePos)))
-                    {
-                        cards[i].setFillColor(sf::Color::Green);
-                    }
+                    if (cards[i].getQuadrant(sf::Vector2f(mousePos)) != 0) {
+                    cout << "Card " << i << "quadrant " <<  cards[i].getQuadrant(sf::Vector2f(mousePos)) << "clicked." << endl;
                 }
+            }
             }
         }
         window.clear(sf::Color::White);

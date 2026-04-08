@@ -45,6 +45,29 @@ public:
         return {};
     }
 
+    int getQuadrant(sf::Vector2f mousePos) {
+        if (!getGlobalBounds().contains(mousePos)) {
+            // Not in the card
+            return 0;
+        }
+        // Get middle point
+        sf::Vector2f middle = {getPos().x + getBounds().x / 2, getPos().y + getBounds().y / 2};
+
+        // Get quadrant, if the user clicked exactly middle point default to quad 1
+        if (mousePos.x <= middle.x && mousePos.y <= middle.y) {
+            return 1;
+        }
+        if (mousePos.x > middle.x && mousePos.y < middle.y) {
+            return 2;
+        }
+        if (mousePos.x < middle.x && mousePos.y > middle.y) {
+            return 3;
+        }
+        if (mousePos.x > middle.x && mousePos.y > middle.y) {
+            return 4;
+        }
+    }
+
     void setBounds(sf::Vector2f bounds)
     {
         i_bounds = bounds;
