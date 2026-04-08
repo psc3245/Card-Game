@@ -9,6 +9,7 @@ public:
     char getSuit() { return suit; }
     char getVal() { return val; }
     bool isFaceUp() {return face_up;}
+    std::string getCardVal() { return std::string(1, suit) + std::string(1, val); }
 
     void setSuit(char suit) { this->suit = suit;}
     void setVal(char val) {this->val = val;}

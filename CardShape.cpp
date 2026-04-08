@@ -6,21 +6,17 @@ class CardShape : public sf::Shape
 {
 public:
     
-    CardShape() : i_bounds({0, 0}), i_pos({0, 0}), 
-    i_color(sf::Color::White), i_card(Card()) {}
+    CardShape() : i_bounds({0, 0}), i_pos({0, 0}), i_card(Card()) {}
     
     explicit CardShape(
         sf::Vector2f bounds,
         sf::Vector2f pos,
-        sf::Color color,
         Card card)
     {
         i_bounds = bounds;
         i_pos = pos;
-        i_color = color;
         i_card = card;
         this->setPosition(i_pos);
-    this->setFillColor(i_color);
         update();
     }
 
@@ -81,13 +77,6 @@ public:
         update();
     }
 
-    void setColor(sf::Color color)
-    {
-        i_color = color;
-        this->setFillColor(i_color);
-        update();
-    }
-
     void setCard(Card card)
     {
         i_card = card;
@@ -103,11 +92,6 @@ public:
         return i_bounds;
     }
 
-    sf::Color getColor()
-    {
-        return i_color;
-    }
-
     Card getCard()
     {
         return i_card;
@@ -116,6 +100,5 @@ public:
 private:
     sf::Vector2f i_bounds;
     sf::Vector2f i_pos;
-    sf::Color i_color;
     Card i_card;
 };
