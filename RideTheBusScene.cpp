@@ -10,7 +10,7 @@ public:
     explicit RideTheBusScene(sf::RenderWindow &window, sf::Font &f, int numPlayers)
         : window(window), font(f),
           header(f, "Welcome to ride the bus", 30), instructions(f, "", 20), goButtonLabel(f, "GO", 50),
-          turn_label(f, "", 30),
+          resultLabel(f, "", 30), turn_label(f, "", 30),
           game(numPlayers)
     {
         // Set Up Text Boxes
@@ -43,6 +43,11 @@ Ready to play?)";
         goButtonLabel.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
         goButtonLabel.setPosition({500.f, 300.f});
 
+        resultLabel.setStyle(sf::Text::Bold);
+        resultLabel.setFillColor(sf::Color::Transparent);
+        b = resultLabel.getLocalBounds();
+        resultLabel.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
+        resultLabel.setPosition({500.f, 300.f});
 
         turn_label.setStyle(sf::Text::Bold);
         turn_label.setFillColor(sf::Color::Black);
@@ -76,6 +81,8 @@ Ready to play?)";
             current_hand.push_back(CardShape({100.f, 140.f}, {285.f + (110.f * i), 570.f}, hand[i], font));
             current_hand[i].setTexture(&back_of_card);
         }
+
+        round_results = std::vector<std::vector<round_outcome>>(numPlayers, std::vector<round_outcome>(4));
     }
 
     SceneType handleEvent(const sf::Event &event) override
@@ -85,6 +92,14 @@ Ready to play?)";
         if (event.is<sf::Event::MouseMoved>())
         {
             auto mousePos = (sf::Vector2f)sf::Mouse::getPosition(window);
+            if (goButton.getGlobalBounds().contains((sf::Vector2f)mousePos))
+            {
+                goButton.setFillColor(sf::Color(249, 223, 157));
+            }
+            else
+            {
+                goButton.setFillColor(sf::Color::Red);
+            }
             for (int i = 0; i < 4; i++)
             {
                 int quad = current_hand[i].getQuadrant(mousePos);
@@ -134,6 +149,16 @@ Ready to play?)";
         if (event.is<sf::Event::MouseButtonPressed>())
         {
             auto mousePos = sf::Mouse::getPosition(window);
+            if (stage == -1)
+            {
+                if (goButton.getGlobalBounds().contains((sf::Vector2f)mousePos))
+                {
+                    stage++;
+                    instructions.setPosition({500.f, 300.f});
+                    instructions.setString(stage_1_instructions);
+                }
+                return SceneType::NONE;
+            }
             for (int i = 0; i < 4; i++)
             {
                 if (i == stage)
@@ -144,7 +169,7 @@ Ready to play?)";
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_1('r', 0);
+                            result = game.handle_round_1('r', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -152,18 +177,36 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_1('d', 0);
+                            result = game.handle_round_1('d', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                         }
+                        round_results[turn][0] = result;
+                        if (result == CORRECT)
+                        {
+                            resultLabel.setString("Correct!");
+                        }
+                        else if (result == WRONG)
+                        {
+                            resultLabel.setString("WRONG! Take a drink!");
+                        }
+                        resultLabel.setFillColor(sf::Color::Black);
+                        turn++;
+                        if (turn == game.getNumPlayers())
+                        {
+                            stage++;
+                            turn = 0;
+                            instructions.setString(stage_2_instructions);
+                        }
+                        return SceneType::NONE;
                     }
                     else if (stage == 1)
                     {
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_2('h', 0);
+                            result = game.handle_round_2('h', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -171,18 +214,40 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_2('l', 0);
+                            result = game.handle_round_2('l', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                         }
+                        round_results[turn][1] = result;
+                        if (result == CORRECT)
+                        {
+                            resultLabel.setString("Correct!");
+                        }
+                        else if (result == WRONG)
+                        {
+                            resultLabel.setString("WRONG! Take a drink!");
+                        }
+                        else
+                        {
+                            resultLabel.setString("Double drinks! Yikes!");
+                        }
+                        resultLabel.setFillColor(sf::Color::Black);
+                        turn++;
+                        if (turn == game.getNumPlayers())
+                        {
+                            stage++;
+                            turn = 0;
+                            instructions.setString(stage_3_instructions);
+                        }
+                        return SceneType::NONE;
                     }
                     else if (stage == 2)
                     {
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_3('o', 0);
+                            result = game.handle_round_3('o', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -190,11 +255,33 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_3('i', 0);
+                            result = game.handle_round_3('i', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                         }
+                        round_results[turn][2] = result;
+                        if (result == CORRECT)
+                        {
+                            resultLabel.setString("Correct!");
+                        }
+                        else if (result == WRONG)
+                        {
+                            resultLabel.setString("WRONG! Take a drink!");
+                        }
+                        else
+                        {
+                            resultLabel.setString("Double drinks! Yikes!");
+                        }
+                        resultLabel.setFillColor(sf::Color::Black);
+                        turn++;
+                        if (turn == game.getNumPlayers())
+                        {
+                            stage++;
+                            turn = 0;
+                            instructions.setString(stage_4_instructions);
+                        }
+                        return SceneType::NONE;
                     }
                     else
                     {
@@ -202,30 +289,47 @@ Ready to play?)";
                         switch (quad)
                         {
                         case 0:
-                            result = game.handle_round_4('h', 0);
+                            result = game.handle_round_4('h', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 1:
-                            result = game.handle_round_4('s', 0);
+                            result = game.handle_round_4('s', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 2:
-                            result = game.handle_round_4('c', 0);
+                            result = game.handle_round_4('c', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 3:
-                            result = game.handle_round_4('d', 0);
+                            result = game.handle_round_4('d', turn);
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         }
+                        round_results[turn][3] = result;
+                        if (result == CORRECT)
+                        {
+                            resultLabel.setString("Correct!");
+                        }
+                        else if (result == WRONG)
+                        {
+                            resultLabel.setString("WRONG! Take a drink!");
+                        }
+                        resultLabel.setFillColor(sf::Color::Black);
+                        turn++;
+                        if (turn == game.getNumPlayers())
+                        {
+                            stage++;
+                            turn = 0;
+                        }
+                        return SceneType::NONE;
                     }
                 }
             }
@@ -246,6 +350,7 @@ Ready to play?)";
             window.draw(goButton);
             window.draw(goButtonLabel);
         }
+        window.draw(resultLabel);
         window.draw(turn_label);
         for (int i = 0; i < current_hand.size(); i++)
         {
@@ -267,6 +372,8 @@ private:
     // Who's turn it currently is within the round
     int turn = 0;
 
+    std::vector<std::vector<round_outcome>> round_results;
+
     // Necessary objects for display
     sf::RenderWindow &window;
     sf::Font &font;
@@ -282,6 +389,14 @@ private:
     sf::RectangleShape goButton;
     sf::Text goButtonLabel;
 
+    sf::Text resultLabel;
+
     sf::Text turn_label;
     std::vector<CardShape> current_hand;
+
+    // Constants
+    const std::string stage_1_instructions = R"(First round - guess if the card is red or black)";
+    const std::string stage_2_instructions = R"(Second round - guess if the next card will be higher or lower than the last card)";
+    const std::string stage_3_instructions = R"(Third round - guess if the next card will be inbetween or outside the previous two cards)";
+    const std::string stage_4_instructions = R"(Fourth round - guess the suit of the final card)";
 };
