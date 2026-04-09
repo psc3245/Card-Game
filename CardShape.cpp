@@ -147,7 +147,7 @@ public:
         }
     }
 
-    void highlight_top(sf::Color color, string text)
+    void highlight_top(sf::Color color, std::string text)
     {
         if (!i_card.face_up)
         {
@@ -163,7 +163,7 @@ public:
             label.setFillColor(sf::Color::White);
         }
     }
-    void highlight_bottom(sf::Color color, string text)
+    void highlight_bottom(sf::Color color, std::string text)
     {
         if (!i_card.face_up)
         {
@@ -179,7 +179,7 @@ public:
             label.setFillColor(sf::Color::White);
         }
     }
-    void highlight_quadrant(sf::Color color, int quadrant, string text)
+    void highlight_quadrant(sf::Color color, int quadrant, std::string text)
     {
         if (!i_card.face_up)
         {
@@ -207,10 +207,6 @@ public:
             quadrants[i].setFillColor(sf::Color::Transparent);
         }
         label.setFillColor(sf::Color::Transparent);
-    }
-
-    Card handle_click(sf::Vector2f mousePos)
-    {
     }
 
 private:

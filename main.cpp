@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "RideTheBusScene.cpp"
+#include "MainMenuScene.cpp"
 
 int main()
 {
@@ -8,14 +9,25 @@ int main()
     sf::Font font;
     font.openFromFile("/System/Library/Fonts/Helvetica.ttc");
 
-    Scene* currentScene = new RideTheBusScene(window, font);
+    Scene *rideTheBusScene = new RideTheBusScene(window, font);
+    Scene *mainMenuScene = new MainMenuScene(window, font);
+    Scene *currentScene = mainMenuScene;
 
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
         {
-            currentScene->handleEvent(*event);
+            SceneType next = currentScene->handleEvent(*event);
+            if (next == SceneType::RIDE_THE_BUS)
+            {
+                int players = static_cast<MainMenuScene *>(currentScene)->getNumPlayers();
+                static_cast<RideTheBusScene *>(rideTheBusScene)->setNumPlayers(players);
+                currentScene = rideTheBusScene;
+            }
+            else if (next == SceneType::MAIN_MENU)
+                currentScene = mainMenuScene;
         }
+        window.clear(sf::Color::White);
         currentScene->update();
         currentScene->draw(window);
         window.display();

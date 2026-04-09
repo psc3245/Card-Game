@@ -7,8 +7,8 @@
 class RideTheBusScene : public Scene
 {
 public:
-    explicit RideTheBusScene(sf::RenderWindow& window, sf::Font& f)
-    : window(window), font(f), header(f, "Welcome to ride the bus", 30), game(1)
+    explicit RideTheBusScene(sf::RenderWindow &window, sf::Font &f)
+        : window(window), font(f), header(f, "Welcome to ride the bus", 30), game(1)
     {
         header.setFillColor(sf::Color::Black);
         header.setPosition({350.f, 20.f});
@@ -38,7 +38,7 @@ public:
         }
     }
 
-    void handleEvent(const sf::Event &event) override
+    SceneType handleEvent(const sf::Event &event) override
     {
         if (event.is<sf::Event::Closed>())
             window.close();
@@ -101,14 +101,16 @@ public:
                     round_outcome result;
                     if (game.stage == 0)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_1('r', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
                             cards[i].unhighlight();
                             cards[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_1('d', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
@@ -118,14 +120,16 @@ public:
                     }
                     else if (game.stage == 1)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_2('h', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
                             cards[i].unhighlight();
                             cards[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_2('l', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
@@ -135,14 +139,16 @@ public:
                     }
                     else if (game.stage == 2)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_3('o', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
                             cards[i].unhighlight();
                             cards[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 || cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_3('i', 0);
                             cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
@@ -184,30 +190,35 @@ public:
                 }
             }
         }
+        return SceneType::RIDE_THE_BUS;
     }
 
-    void update()
+    void update() override
     {
     }
 
-    void draw(sf::RenderWindow &window)
+    void draw(sf::RenderWindow &window) override
     {
         window.draw(header);
-        for (int i = 0; i < cards.size(); i++) {
+        for (int i = 0; i < cards.size(); i++)
+        {
             window.draw(cards[i]);
         }
     }
 
-private:
-RideTheBus game;
+    void setNumPlayers(int n) {
+        game.setNumPlayers(n);
+    }
 
-    sf::RenderWindow& window;
+private:
+    RideTheBus game;
+
+    sf::RenderWindow &window;
     sf::Text header;
-    sf::Font& font;
+    sf::Font &font;
     sf::Texture back_of_card;
 
     std::map<std::string, sf::Texture> *all_cards;
 
     std::vector<CardShape> cards;
-
 };

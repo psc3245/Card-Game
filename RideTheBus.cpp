@@ -114,6 +114,14 @@ public:
         return hands[player - 1];
     }
 
+    int getNumPlayers() {
+        return numPlayers;
+    }
+
+    void setNumPlayers(int n) {
+        numPlayers = n;
+    }
+
 private:
     int numPlayers;
     int players_remaining;
