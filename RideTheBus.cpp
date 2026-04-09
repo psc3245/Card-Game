@@ -15,11 +15,9 @@ enum round_outcome
 class RideTheBus
 {
 public:
-    int stage;
 
     round_outcome handle_round_1(char choice, int player)
     {
-        stage++;
         char color;
         if (hands[player][0].getSuit() == 'H' || hands[player][0].getSuit() == 'D')
         {
@@ -41,7 +39,6 @@ public:
 
     round_outcome handle_round_2(char choice, int player)
     {
-        stage++;
         int prev = map_hand_value(hands[player][0].getVal());
         int curr = map_hand_value(hands[player][1].getVal());
         if (curr == prev)
@@ -57,7 +54,6 @@ public:
 
     round_outcome handle_round_3(char choice, int player)
     {
-        stage++;
         int first = map_hand_value(hands[player][0].getVal());
         int second = map_hand_value(hands[player][1].getVal());
         int third = map_hand_value(hands[player][2].getVal());
@@ -80,7 +76,6 @@ public:
 
     round_outcome handle_round_4(char choice, int player)
     {
-        stage++;
         if (choice == std::tolower(hands[player][3].getSuit()))
             return CORRECT;
         return WRONG;
@@ -89,15 +84,12 @@ public:
     RideTheBus(int players)
     {
         this->numPlayers = players;
-        this->players_remaining = players;
         hands = new Card *[players];
 
         for (int p = 0; p < players; p++)
         {
             hands[p] = new Card[4];
         }
-
-        stage = 0;
 
         deck.shuffle();
 
@@ -106,12 +98,12 @@ public:
 
     Card *getHand(int player)
     {
-        if (player > this->numPlayers)
+        if (player >= this->numPlayers)
         {
             cerr << "Out of bounds" << endl;
             return NULL;
         }
-        return hands[player - 1];
+        return hands[player];
     }
 
     int getNumPlayers() {
@@ -124,7 +116,6 @@ public:
 
 private:
     int numPlayers;
-    int players_remaining;
 
     Deck deck;
     Card **hands;

@@ -8,8 +8,10 @@ public:
     explicit MainMenuScene(sf::RenderWindow &window, sf::Font &f)
         : window(window), font(f), header(f, "Welcome to Card Game", 30), instructions(f, "Select Your Game", 30)
     {
+        header.setStyle(sf::Text::Bold);
         header.setFillColor(sf::Color::Black);
         header.setPosition({350.f, 20.f});
+        instructions.setStyle(sf::Text::Bold);
         instructions.setFillColor(sf::Color::Black);
         instructions.setPosition({375.f, 200.f});
         buttons.push_back(MainMenuButtonShape({500, 80}, {250, 300}, font, "Ride the Bus"));
@@ -51,10 +53,11 @@ public:
                 {
                     setNumPlayers(which + 1);
                     // need logic to determine which button was pressed but for now we only have one
-                    return SceneType::RIDE_THE_BUS;
+                    return buttonsMap[which];
                 }
             }
         }
+        return SceneType::NONE;
     }
 
     void update() override
@@ -99,4 +102,5 @@ private:
     std::vector<MainMenuButtonShape> buttons;
     int num_players = 1;
     Games game = Games::NONE;
+    SceneType buttonsMap[1] = {SceneType::RIDE_THE_BUS};
 };

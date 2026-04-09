@@ -9,7 +9,6 @@ int main()
     sf::Font font;
     font.openFromFile("/System/Library/Fonts/Helvetica.ttc");
 
-    Scene *rideTheBusScene = new RideTheBusScene(window, font);
     Scene *mainMenuScene = new MainMenuScene(window, font);
     Scene *currentScene = mainMenuScene;
 
@@ -21,8 +20,8 @@ int main()
             if (next == SceneType::RIDE_THE_BUS)
             {
                 int players = static_cast<MainMenuScene *>(currentScene)->getNumPlayers();
-                static_cast<RideTheBusScene *>(rideTheBusScene)->setNumPlayers(players);
-                currentScene = rideTheBusScene;
+                printf("players: %d\n", players); fflush(stdout);
+                currentScene = new RideTheBusScene(window, font, players);
             }
             else if (next == SceneType::MAIN_MENU)
                 currentScene = mainMenuScene;

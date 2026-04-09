@@ -7,12 +7,51 @@
 class RideTheBusScene : public Scene
 {
 public:
-    explicit RideTheBusScene(sf::RenderWindow &window, sf::Font &f)
-        : window(window), font(f), header(f, "Welcome to ride the bus", 30), game(1)
+    explicit RideTheBusScene(sf::RenderWindow &window, sf::Font &f, int numPlayers)
+        : window(window), font(f),
+          header(f, "Welcome to ride the bus", 30), instructions(f, "", 20), goButtonLabel(f, "GO", 50),
+          turn_label(f, "", 30),
+          game(numPlayers)
     {
+        // Set Up Text Boxes
+        header.setStyle(sf::Text::Bold);
         header.setFillColor(sf::Color::Black);
-        header.setPosition({350.f, 20.f});
+        sf::FloatRect b = header.getLocalBounds();
+        header.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
+        header.setPosition({500.f, 30.f});
 
+        instructions.setStyle(sf::Text::Bold);
+        instructions.setFillColor(sf::Color::Black);
+        std::string instructions_text = R"(Ride the Bus is a card game where you make a guess about the card each round.
+You may give or receieve drinks based on if you are correct or not. 
+Be careful, if the choice is impossible, it's double drinks for you.
+Ready to play?)";
+        instructions.setString(instructions_text);
+        b = instructions.getLocalBounds();
+        instructions.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
+        instructions.setPosition({500.f, 150.f});
+
+        goButton.setFillColor(sf::Color::Red);
+        goButton.setOutlineColor(sf::Color::Black);
+        goButton.setOutlineThickness(2);
+        goButton.setSize({300, 80});
+        goButton.setPosition({500.f - 150.f, 300.f - 40.f});
+
+        goButtonLabel.setStyle(sf::Text::Bold);
+        goButtonLabel.setFillColor(sf::Color::Black);
+        b = goButtonLabel.getLocalBounds();
+        goButtonLabel.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
+        goButtonLabel.setPosition({500.f, 300.f});
+
+
+        turn_label.setStyle(sf::Text::Bold);
+        turn_label.setFillColor(sf::Color::Black);
+        turn_label.setString("Player 1's Turn:");
+        b = turn_label.getLocalBounds();
+        turn_label.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
+        turn_label.setPosition({500.f, 480.f});
+
+        // Set Up All Textures
         back_of_card.loadFromFile("./Assets/card_back.png");
 
         char suits[4] = {'H', 'D', 'S', 'C'};
@@ -29,12 +68,13 @@ public:
             }
         }
 
-        Card *hand = game.getHand(1);
+        // Get the first player's hand
+        Card *hand = game.getHand(0);
 
         for (int i = 0; i < 4; i++)
         {
-            cards.push_back(CardShape({100.f, 140.f}, {285.f + (110.f * i), 570.f}, hand[i], font));
-            cards[i].setTexture(&back_of_card);
+            current_hand.push_back(CardShape({100.f, 140.f}, {285.f + (110.f * i), 570.f}, hand[i], font));
+            current_hand[i].setTexture(&back_of_card);
         }
     }
 
@@ -47,47 +87,47 @@ public:
             auto mousePos = (sf::Vector2f)sf::Mouse::getPosition(window);
             for (int i = 0; i < 4; i++)
             {
-                int quad = cards[i].getQuadrant(mousePos);
+                int quad = current_hand[i].getQuadrant(mousePos);
 
-                if (i == 0 && game.stage == 0)
+                if (i == 0 && stage == 0)
                 {
                     if (quad == -1)
-                        cards[i].unhighlight();
+                        current_hand[i].unhighlight();
                     else if (quad < 2)
-                        cards[i].highlight_top(sf::Color::Red, "Red");
+                        current_hand[i].highlight_top(sf::Color::Red, "Red");
                     else
-                        cards[i].highlight_bottom(sf::Color::Black, "Black");
+                        current_hand[i].highlight_bottom(sf::Color::Black, "Black");
                 }
-                else if (i == 1 && game.stage == 1)
+                else if (i == 1 && stage == 1)
                 {
                     if (quad == -1)
-                        cards[i].unhighlight();
+                        current_hand[i].unhighlight();
                     else if (quad < 2)
-                        cards[i].highlight_top(sf::Color::Red, "Higher");
+                        current_hand[i].highlight_top(sf::Color::Red, "Higher");
                     else
-                        cards[i].highlight_bottom(sf::Color::Black, "Lower");
+                        current_hand[i].highlight_bottom(sf::Color::Black, "Lower");
                 }
-                else if (i == 2 && game.stage == 2)
+                else if (i == 2 && stage == 2)
                 {
                     if (quad == -1)
-                        cards[i].unhighlight();
+                        current_hand[i].unhighlight();
                     else if (quad < 2)
-                        cards[i].highlight_top(sf::Color::Red, "Outside");
+                        current_hand[i].highlight_top(sf::Color::Red, "Outside");
                     else
-                        cards[i].highlight_bottom(sf::Color::Black, "Inside");
+                        current_hand[i].highlight_bottom(sf::Color::Black, "Inside");
                 }
-                else if (i == 3 && game.stage == 3)
+                else if (i == 3 && stage == 3)
                 {
                     if (quad == -1)
-                        cards[i].unhighlight();
+                        current_hand[i].unhighlight();
                     else if (quad == 0)
-                        cards[i].highlight_quadrant(sf::Color::Red, quad, "H");
+                        current_hand[i].highlight_quadrant(sf::Color::Red, quad, "H");
                     else if (quad == 1)
-                        cards[i].highlight_quadrant(sf::Color::Black, quad, "S");
+                        current_hand[i].highlight_quadrant(sf::Color::Black, quad, "S");
                     else if (quad == 2)
-                        cards[i].highlight_quadrant(sf::Color::Black, quad, "C");
+                        current_hand[i].highlight_quadrant(sf::Color::Black, quad, "C");
                     else
-                        cards[i].highlight_quadrant(sf::Color::Red, quad, "D");
+                        current_hand[i].highlight_quadrant(sf::Color::Red, quad, "D");
                 }
             }
         }
@@ -96,101 +136,101 @@ public:
             auto mousePos = sf::Mouse::getPosition(window);
             for (int i = 0; i < 4; i++)
             {
-                if (i == game.stage)
+                if (i == stage)
                 {
                     round_outcome result;
-                    if (game.stage == 0)
+                    if (stage == 0)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
-                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_1('r', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
-                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_1('d', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
                     }
-                    else if (game.stage == 1)
+                    else if (stage == 1)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
-                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_2('h', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
-                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_2('l', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
                     }
-                    else if (game.stage == 2)
+                    else if (stage == 2)
                     {
-                        if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
-                            cards[i].getQuadrant((sf::Vector2f)mousePos) == 1)
+                        if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
+                            current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
                             result = game.handle_round_3('o', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
-                        else if (cards[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
-                                 cards[i].getQuadrant((sf::Vector2f)mousePos) == 3)
+                        else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
+                                 current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
                             result = game.handle_round_3('i', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                         }
                     }
                     else
                     {
-                        int quad = cards[i].getQuadrant((sf::Vector2f)mousePos);
+                        int quad = current_hand[i].getQuadrant((sf::Vector2f)mousePos);
                         switch (quad)
                         {
                         case 0:
                             result = game.handle_round_4('h', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 1:
                             result = game.handle_round_4('s', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 2:
                             result = game.handle_round_4('c', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 3:
                             result = game.handle_round_4('d', 0);
-                            cards[i].setTexture(&(*all_cards)[cards[i].getCard().getCardVal()]);
-                            cards[i].unhighlight();
-                            cards[i].getCard().toggleFaceUp(true);
+                            current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
+                            current_hand[i].unhighlight();
+                            current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         }
                     }
                 }
             }
         }
-        return SceneType::RIDE_THE_BUS;
+        return SceneType::NONE;
     }
 
     void update() override
@@ -200,25 +240,48 @@ public:
     void draw(sf::RenderWindow &window) override
     {
         window.draw(header);
-        for (int i = 0; i < cards.size(); i++)
+        window.draw(instructions);
+        if (stage == -1)
         {
-            window.draw(cards[i]);
+            window.draw(goButton);
+            window.draw(goButtonLabel);
+        }
+        window.draw(turn_label);
+        for (int i = 0; i < current_hand.size(); i++)
+        {
+            window.draw(current_hand[i]);
         }
     }
 
-    void setNumPlayers(int n) {
+    void setNumPlayers(int n)
+    {
         game.setNumPlayers(n);
     }
 
 private:
+    // Game Model
     RideTheBus game;
 
-    sf::RenderWindow &window;
-    sf::Text header;
-    sf::Font &font;
-    sf::Texture back_of_card;
+    // What round the game is in - starts at negative one for pregame instructions
+    int stage = -1;
+    // Who's turn it currently is within the round
+    int turn = 0;
 
+    // Necessary objects for display
+    sf::RenderWindow &window;
+    sf::Font &font;
+
+    // Texture
+    sf::Texture back_of_card;
     std::map<std::string, sf::Texture> *all_cards;
 
-    std::vector<CardShape> cards;
+    // Objects Displayed on the Screen
+    sf::Text header;
+
+    sf::Text instructions;
+    sf::RectangleShape goButton;
+    sf::Text goButtonLabel;
+
+    sf::Text turn_label;
+    std::vector<CardShape> current_hand;
 };

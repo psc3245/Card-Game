@@ -16,6 +16,7 @@ public:
         body.setOutlineColor(sf::Color::Black);
         body.setOutlineThickness(2);
         label = sf::Text(f, text, 50);
+        label.setStyle(sf::Text::Bold);
         label.setFillColor(sf::Color::Black);
         sf::FloatRect textBounds = label.getLocalBounds();
         label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
@@ -38,6 +39,7 @@ public:
             playerButtons[i].setPosition({subX, subY});
             playerButtons[i].setFillColor(sf::Color::Transparent);
             playerButtonLabels.push_back(sf::Text(font, std::to_string(i + 1), 50));
+            playerButtonLabels[i].setStyle(sf::Text::Bold);
             playerButtonLabels[i].setFillColor(sf::Color::Transparent);
             playerButtonLabels[i].setString(std::to_string(i + 1));
             sf::FloatRect textBounds = playerButtonLabels[i].getLocalBounds();
