@@ -19,6 +19,7 @@ public:
 
     round_outcome handle_round_1(char choice, int player)
     {
+        stage++;
         char color;
         if (hands[player][0].getSuit() == 'H' || hands[player][0].getSuit() == 'D')
         {
@@ -40,6 +41,7 @@ public:
 
     round_outcome handle_round_2(char choice, int player)
     {
+        stage++;
         int prev = map_hand_value(hands[player][0].getVal());
         int curr = map_hand_value(hands[player][1].getVal());
         if (curr == prev)
@@ -55,6 +57,7 @@ public:
 
     round_outcome handle_round_3(char choice, int player)
     {
+        stage++;
         int first = map_hand_value(hands[player][0].getVal());
         int second = map_hand_value(hands[player][1].getVal());
         int third = map_hand_value(hands[player][2].getVal());
@@ -77,6 +80,7 @@ public:
 
     round_outcome handle_round_4(char choice, int player)
     {
+        stage++;
         if (choice == std::tolower(hands[player][3].getSuit()))
             return CORRECT;
         return WRONG;
@@ -110,34 +114,13 @@ public:
         return hands[player - 1];
     }
 
-    round_outcome entry_function (char choice, int player) {
-
-        round_outcome ret;
-
-        switch (stage) {
-            case 1:
-                ret = handle_round_1(choice, player);
-                break;
-            case 2:
-                ret = handle_round_2(choice, player);
-                break;
-            case 3:
-                ret = handle_round_3(choice, player);
-                break;
-            case 4:
-                ret = handle_round_4(choice, player);
-                break;
-        }
-        return ret;
-    }
-
 private:
     int numPlayers;
     int players_remaining;
 
     Deck deck;
     Card **hands;
-    
+
     int map_hand_value(char val)
     {
         if (val == 'A')

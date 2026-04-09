@@ -5,18 +5,9 @@
 class CardShape : public sf::Shape
 {
 public:
-    CardShape() : i_bounds({0, 0}), i_pos({0, 0}), i_card(Card()), label(font)
-    {
-        body = *new sf::RectangleShape(i_bounds);
-        body.setPosition(i_pos);
-        this->font = font;
-        label = sf::Text(font, "", 20);
-        label.setFillColor(sf::Color::Transparent);
-        init_quadrants();
-    }
 
-    explicit CardShape(sf::Vector2f bounds, sf::Vector2f pos, Card card, sf::Font f)
-        : i_bounds(bounds), i_pos(pos), i_card(card), font(f), label(f)
+    explicit CardShape(sf::Vector2f bounds, sf::Vector2f pos, Card card, sf::Font& f)
+        : i_bounds(bounds), i_pos(pos), i_card(card), font(f), label(f, "", 20)
     {
         i_bounds = bounds;
         i_pos = pos;
@@ -24,7 +15,6 @@ public:
         this->setPosition(i_pos);
         body = sf::RectangleShape(i_bounds);
         body.setPosition(i_pos);
-        this->font = f;
         label = sf::Text(f, "", 20);
         label.setFillColor(sf::Color::Transparent);
         init_quadrants();
@@ -159,47 +149,57 @@ public:
 
     void highlight_top(sf::Color color, string text)
     {
-        unhighlight();
-        quadrants[0].setFillColor(color);
-        quadrants[1].setFillColor(color);
-        label.setString(text);
-        sf::FloatRect textBounds = label.getLocalBounds();
-        label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
-                         textBounds.position.y + textBounds.size.y / 2});
-        float y_mid = quadrants[0].getPosition().y + quadrants[0].getSize().y / 2;
-        label.setPosition({getPos().x + getBounds().x / 2, y_mid});
-        label.setFillColor(sf::Color::White);
+        if (!i_card.face_up)
+        {
+            unhighlight();
+            quadrants[0].setFillColor(color);
+            quadrants[1].setFillColor(color);
+            label.setString(text);
+            sf::FloatRect textBounds = label.getLocalBounds();
+            label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
+                             textBounds.position.y + textBounds.size.y / 2});
+            float y_mid = quadrants[0].getPosition().y + quadrants[0].getSize().y / 2;
+            label.setPosition({getPos().x + getBounds().x / 2, y_mid});
+            label.setFillColor(sf::Color::White);
+        }
     }
     void highlight_bottom(sf::Color color, string text)
     {
-        unhighlight();
-        quadrants[2].setFillColor(color);
-        quadrants[3].setFillColor(color);
-        sf::FloatRect textBounds = label.getLocalBounds();
-        label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
-                         textBounds.position.y + textBounds.size.y / 2});
-        float y_mid = quadrants[2].getPosition().y + quadrants[2].getSize().y / 2;
-        label.setPosition({getPos().x + getBounds().x / 2, y_mid});
-        label.setString(text);
-        label.setFillColor(sf::Color::White);
+        if (!i_card.face_up)
+        {
+            unhighlight();
+            quadrants[2].setFillColor(color);
+            quadrants[3].setFillColor(color);
+            sf::FloatRect textBounds = label.getLocalBounds();
+            label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
+                             textBounds.position.y + textBounds.size.y / 2});
+            float y_mid = quadrants[2].getPosition().y + quadrants[2].getSize().y / 2;
+            label.setPosition({getPos().x + getBounds().x / 2, y_mid});
+            label.setString(text);
+            label.setFillColor(sf::Color::White);
+        }
     }
     void highlight_quadrant(sf::Color color, int quadrant, string text)
     {
-        unhighlight();
-        if (quadrant > 3)
+        if (!i_card.face_up)
         {
-            return;
+            unhighlight();
+            if (quadrant > 3)
+            {
+                return;
+            }
+            quadrants[quadrant].setFillColor(color);
+            label.setString(text);
+            sf::FloatRect textBounds = label.getLocalBounds();
+            label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
+                             textBounds.position.y + textBounds.size.y / 2});
+            float x_mid = quadrants[quadrant].getPosition().x + quadrants[quadrant].getSize().x / 2;
+            float y_mid = quadrants[quadrant].getPosition().y + quadrants[quadrant].getSize().y / 2;
+            label.setPosition({x_mid, y_mid});
+            label.setFillColor(sf::Color::White);
         }
-        quadrants[quadrant].setFillColor(color);
-        label.setString(text);
-        sf::FloatRect textBounds = label.getLocalBounds();
-        label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
-                         textBounds.position.y + textBounds.size.y / 2});
-        float x_mid = quadrants[quadrant].getPosition().x + quadrants[quadrant].getSize().x / 2;
-        float y_mid = quadrants[quadrant].getPosition().y + quadrants[quadrant].getSize().y / 2;
-        label.setPosition({x_mid, y_mid});
-        label.setFillColor(sf::Color::White);
     }
+
     void unhighlight()
     {
         for (int i = 0; i < 4; i++)
@@ -209,6 +209,10 @@ public:
         label.setFillColor(sf::Color::Transparent);
     }
 
+    Card handle_click(sf::Vector2f mousePos)
+    {
+    }
+
 private:
     sf::Vector2f i_bounds;
     sf::Vector2f i_pos;
@@ -216,5 +220,5 @@ private:
     sf::RectangleShape body;
     sf::RectangleShape quadrants[4];
     sf::Text label;
-    sf::Font font;
+    sf::Font& font;
 };
