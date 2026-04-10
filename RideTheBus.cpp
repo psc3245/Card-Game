@@ -7,6 +7,7 @@ using namespace std;
 
 enum round_outcome
 {
+    TBD,
     CORRECT,
     WRONG,
     DOUBLE
@@ -15,6 +16,59 @@ enum round_outcome
 class RideTheBus
 {
 public:
+    RideTheBus(int players)
+    {
+        this->numPlayers = players;
+        hands = new Card *[players];
+
+        for (int p = 0; p < players; p++)
+        {
+            hands[p] = new Card[4];
+        }
+
+        deck.shuffle();
+
+        hands = deck.deal_hands(numPlayers, 4);
+
+        round_results = std::vector<std::vector<round_outcome>>(numPlayers, std::vector<round_outcome>(4));
+        for (int i = 0; i < numPlayers; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                round_results[i][j] = TBD;
+            }
+        }
+
+        stage = 0;
+        turn = 0;
+    }
+
+    round_outcome submitGuess(char choice)
+    {
+        switch (stage)
+        {
+        case 0:
+            round_results[turn][stage] = handle_round_1(choice, turn);
+            break;
+        case 1:
+            round_results[turn][stage] = handle_round_2(choice, turn);
+            break;
+        case 2:
+            round_results[turn][stage] = handle_round_3(choice, turn);
+            break;
+        case 3:
+            round_results[turn][stage] = handle_round_4(choice, turn);
+            break;
+        case 4:
+            // game is over
+            break;
+        }
+        turn ++;
+        if (turn == numPlayers) {
+            turn = 0;
+            stage ++;
+        }
+    }
 
     round_outcome handle_round_1(char choice, int player)
     {
@@ -81,21 +135,6 @@ public:
         return WRONG;
     }
 
-    RideTheBus(int players)
-    {
-        this->numPlayers = players;
-        hands = new Card *[players];
-
-        for (int p = 0; p < players; p++)
-        {
-            hands[p] = new Card[4];
-        }
-
-        deck.shuffle();
-
-        hands = deck.deal_hands(numPlayers, 4);
-    }
-
     Card *getHand(int player)
     {
         if (player >= this->numPlayers)
@@ -106,16 +145,27 @@ public:
         return hands[player];
     }
 
-    int getNumPlayers() {
+    int getNumPlayers()
+    {
         return numPlayers;
     }
 
-    void setNumPlayers(int n) {
+    void setNumPlayers(int n)
+    {
         numPlayers = n;
     }
 
+    int getStage() { return stage; }
+
+    int getTurn() { return turn; }
+
 private:
     int numPlayers;
+
+    int stage;
+    int turn;
+
+    std::vector<std::vector<round_outcome>> round_results;
 
     Deck deck;
     Card **hands;

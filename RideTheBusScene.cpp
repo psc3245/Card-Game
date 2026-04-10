@@ -393,6 +393,7 @@ private:
 
     sf::Text turn_label;
     std::vector<CardShape> current_hand;
+    std::vector<std::vector<CardShape>> all_hands;
 
     // Constants
     const std::string stage_1_instructions = R"(First round - guess if the card is red or black)";
