@@ -12,6 +12,7 @@ public:
         i_bounds = bounds;
         i_pos = pos;
         i_card = card;
+        is_active = false;
         this->setPosition(i_pos);
         body = sf::RectangleShape(i_bounds);
         body.setPosition(i_pos);
@@ -59,9 +60,9 @@ public:
 
     int getQuadrant(sf::Vector2f mousePos)
     {
-        if (!getGlobalBounds().contains(mousePos))
+        if (!getGlobalBounds().contains(mousePos) || !is_active)
         {
-            // Not in the card
+            // Not in the card or card inactive
             return -1;
         }
         // Get middle point
@@ -209,10 +210,17 @@ public:
         label.setFillColor(sf::Color::Transparent);
     }
 
+    void set_is_active(bool b) {
+        is_active = b;
+    }
+
+    bool get_is_active() { return is_active; }
+
 private:
     sf::Vector2f i_bounds;
     sf::Vector2f i_pos;
     Card i_card;
+    bool is_active;
     sf::RectangleShape body;
     sf::RectangleShape quadrants[4];
     sf::Text label;
