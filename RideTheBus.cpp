@@ -19,12 +19,6 @@ public:
     RideTheBus(int players)
     {
         this->numPlayers = players;
-        hands = new Card *[players];
-
-        for (int p = 0; p < players; p++)
-        {
-            hands[p] = new Card[4];
-        }
 
         deck.shuffle();
 
@@ -45,19 +39,24 @@ public:
 
     round_outcome submitGuess(char choice)
     {
+        round_outcome result;
         switch (stage)
         {
         case 0:
-            round_results[turn][stage] = handle_round_1(choice, turn);
+            result = handle_round_1(choice);
+            round_results[turn][stage] = result;
             break;
         case 1:
-            round_results[turn][stage] = handle_round_2(choice, turn);
+            result = handle_round_2(choice);
+            round_results[turn][stage] = result;
             break;
         case 2:
-            round_results[turn][stage] = handle_round_3(choice, turn);
+            result = handle_round_3(choice);
+            round_results[turn][stage] = result;
             break;
         case 3:
-            round_results[turn][stage] = handle_round_4(choice, turn);
+            result = handle_round_4(choice);
+            round_results[turn][stage] = result;
             break;
         case 4:
             // game is over
@@ -68,72 +67,10 @@ public:
             turn = 0;
             stage ++;
         }
+        return result;
     }
 
-    round_outcome handle_round_1(char choice, int player)
-    {
-        char color;
-        if (hands[player][0].getSuit() == 'H' || hands[player][0].getSuit() == 'D')
-        {
-            color = 'r';
-        }
-        else
-        {
-            color = 'd';
-        }
-        if (color == choice)
-        {
-            return CORRECT;
-        }
-        else
-        {
-            return WRONG;
-        }
-    }
-
-    round_outcome handle_round_2(char choice, int player)
-    {
-        int prev = map_hand_value(hands[player][0].getVal());
-        int curr = map_hand_value(hands[player][1].getVal());
-        if (curr == prev)
-        {
-            return DOUBLE;
-        }
-        if ((choice == 'h' && curr > prev) || (choice == 'l' && curr < prev))
-        {
-            return CORRECT;
-        }
-        return WRONG;
-    }
-
-    round_outcome handle_round_3(char choice, int player)
-    {
-        int first = map_hand_value(hands[player][0].getVal());
-        int second = map_hand_value(hands[player][1].getVal());
-        int third = map_hand_value(hands[player][2].getVal());
-        if (third == first || third == second)
-        {
-            return DOUBLE;
-        }
-        if (choice == 'i')
-        {
-            if ((first > third && second < third) || (first < third && second > third))
-                return CORRECT;
-        }
-        if (choice == 'o')
-        {
-            if ((first < third && second < third) || (first > third && second > third))
-                return CORRECT;
-        }
-        return WRONG;
-    }
-
-    round_outcome handle_round_4(char choice, int player)
-    {
-        if (choice == std::tolower(hands[player][3].getSuit()))
-            return CORRECT;
-        return WRONG;
-    }
+    
 
     Card *getHand(int player)
     {
@@ -183,5 +120,70 @@ private:
         if (val == 'T')
             return 10;
         return val - '0';
+    }
+
+    round_outcome handle_round_1(char choice)
+    {
+        char color;
+        if (hands[turn][0].getSuit() == 'H' || hands[turn][0].getSuit() == 'D')
+        {
+            color = 'r';
+        }
+        else
+        {
+            color = 'd';
+        }
+        if (color == choice)
+        {
+            return CORRECT;
+        }
+        else
+        {
+            return WRONG;
+        }
+    }
+
+    round_outcome handle_round_2(char choice)
+    {
+        int prev = map_hand_value(hands[turn][0].getVal());
+        int curr = map_hand_value(hands[turn][1].getVal());
+        if (curr == prev)
+        {
+            return DOUBLE;
+        }
+        if ((choice == 'h' && curr > prev) || (choice == 'l' && curr < prev))
+        {
+            return CORRECT;
+        }
+        return WRONG;
+    }
+
+    round_outcome handle_round_3(char choice)
+    {
+        int first = map_hand_value(hands[turn][0].getVal());
+        int second = map_hand_value(hands[turn][1].getVal());
+        int third = map_hand_value(hands[turn][2].getVal());
+        if (third == first || third == second)
+        {
+            return DOUBLE;
+        }
+        if (choice == 'i')
+        {
+            if ((first > third && second < third) || (first < third && second > third))
+                return CORRECT;
+        }
+        if (choice == 'o')
+        {
+            if ((first < third && second < third) || (first > third && second > third))
+                return CORRECT;
+        }
+        return WRONG;
+    }
+
+    round_outcome handle_round_4(char choice)
+    {
+        if (choice == std::tolower(hands[turn][3].getSuit()))
+            return CORRECT;
+        return WRONG;
     }
 };

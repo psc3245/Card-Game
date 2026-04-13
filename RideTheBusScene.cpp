@@ -169,7 +169,7 @@ Ready to play?)";
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_1('r', turn);
+                            result = game.submitGuess('r');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -177,7 +177,7 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_1('d', turn);
+                            result = game.submitGuess('d');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -206,7 +206,7 @@ Ready to play?)";
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_2('h', turn);
+                            result = game.submitGuess('h');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -214,7 +214,7 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_2('l', turn);
+                            result = game.submitGuess('l');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -247,7 +247,7 @@ Ready to play?)";
                         if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 0 ||
                             current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 1)
                         {
-                            result = game.handle_round_3('o', turn);
+                            result = game.submitGuess('o');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -255,7 +255,7 @@ Ready to play?)";
                         else if (current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 2 ||
                                  current_hand[i].getQuadrant((sf::Vector2f)mousePos) == 3)
                         {
-                            result = game.handle_round_3('i', turn);
+                            result = game.submitGuess('i');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
@@ -289,25 +289,25 @@ Ready to play?)";
                         switch (quad)
                         {
                         case 0:
-                            result = game.handle_round_4('h', turn);
+                            result = game.submitGuess('h');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 1:
-                            result = game.handle_round_4('s', turn);
+                            result = game.submitGuess('s');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 2:
-                            result = game.handle_round_4('c', turn);
+                            result = game.submitGuess('c');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
                             break;
                         case 3:
-                            result = game.handle_round_4('d', turn);
+                            result = game.submitGuess('d');
                             current_hand[i].setTexture(&(*all_cards)[current_hand[i].getCard().getCardVal()]);
                             current_hand[i].unhighlight();
                             current_hand[i].getCard().toggleFaceUp(true);
