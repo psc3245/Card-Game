@@ -159,10 +159,13 @@ Ready to play?)";
             {
                 if (goButton.getGlobalBounds().contains(mousePos))
                 {
+                    if (isPregame)
+                        isPregame = false;
                     instructions.setPosition({500.f, 300.f});
                     instructions.setString(getInstructionsForRound());
                     isRoundActive = true;
                     all_hands[game.getTurn()][game.getStage()].set_is_active(true);
+                    setSeatPositions();
                 }
                 return SceneType::NONE;
             }
@@ -241,22 +244,28 @@ Ready to play?)";
 
     void draw(sf::RenderWindow &window) override
     {
-        window.draw(header);
         window.draw(instructions);
         if (!isRoundActive)
         {
             window.draw(goButton);
             window.draw(goButtonLabel);
         }
-        window.draw(resultLabel);
-        window.draw(turn_label);
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        if (!isPregame)
         {
-            for (int j = 0; j < 4; j++)
+            instructions.setCharacterSize(25);
+            instructions.setPosition({500, 375.f});
+            window.draw(resultLabel);
+            window.draw(turn_label);
+            for (int i = 0; i < game.getNumPlayers(); i++)
             {
-                window.draw(all_hands[i][j]);
+                for (int j = 0; j < 4; j++)
+                {
+                    window.draw(all_hands[i][j]);
+                }
             }
         }
+        else
+            window.draw(header);
     }
 
     void setNumPlayers(int n)
@@ -289,7 +298,11 @@ Ready to play?)";
     // offset 3 → top
     int getPlayerSeat(int i)
     {
-        return (i - game.getTurn() + game.getNumPlayers()) % game.getNumPlayers();
+        if (game.getNumPlayers() < 4)
+            return (i - game.getTurn() + game.getNumPlayers()) % game.getNumPlayers();
+        int clockwise[4] = {0, 1, 3, 2};
+        int offset = (i - game.getTurn() + game.getNumPlayers()) % game.getNumPlayers();
+        return clockwise[offset];
     }
 
     void setSeatPositions()
@@ -302,7 +315,9 @@ Ready to play?)";
                 switch (getPlayerSeat(i))
                 {
                 case 0:
-                    all_hands[i][j].setPos({285.f + (110.f * j), 600.f});
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({330.f + (110.f * j), 640.f});
+                    all_hands[i][j].setRotation(zero_degree_rotation);
                     break;
                 case 1:
                     all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
@@ -315,7 +330,9 @@ Ready to play?)";
                     all_hands[i][j].setRotation(ninety_degree_rotation);
                     break;
                 case 3:
-                    all_hands[i][j].setPos({285.f + (110.f * j), 10.f});
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({330.f + (110.f * j), 80.f});
+                    all_hands[i][j].setRotation(zero_degree_rotation);
                     break;
                 }
             }
@@ -328,6 +345,7 @@ private:
 
     // Determines whether or not we allow guesses
     bool isRoundActive = false;
+    bool isPregame = true;
 
     // Necessary objects for display
     sf::RenderWindow &window;
@@ -357,5 +375,6 @@ private:
     const std::string stage_3_instructions = R"(Third round - guess if the next card will be inbetween or outside the previous two cards)";
     const std::string stage_4_instructions = R"(Fourth round - guess the suit of the final card)";
 
+    const sf::Angle zero_degree_rotation = sf::degrees(0.f);
     const sf::Angle ninety_degree_rotation = sf::degrees(90.f);
 };

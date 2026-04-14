@@ -137,8 +137,7 @@ public:
             sf::FloatRect textBounds = label.getLocalBounds();
             label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
                              textBounds.position.y + textBounds.size.y / 2});
-            float y_mid = quadrants[0].getSize().y / 2;
-            label.setPosition({getBounds().x / 2, y_mid});
+            label.setPosition({getBounds().x / 2, getBounds().y / 4});
             label.setFillColor(sf::Color::White);
         }
     }
@@ -153,7 +152,7 @@ public:
             label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
                              textBounds.position.y + textBounds.size.y / 2});
             float y_mid = getBounds().y / 2 + quadrants[2].getSize().y / 2;
-            label.setPosition({getBounds().x / 2, y_mid});
+            label.setPosition({getBounds().x / 2, getBounds().y * 3 / 4});
             label.setString(text);
             label.setFillColor(sf::Color::White);
         }
