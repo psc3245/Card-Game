@@ -2,11 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include "Card.h"
 
-class CardShape : public sf::Shape
+class CardShape : public sf::Drawable, public sf::Transformable
 {
 public:
-
-    explicit CardShape(sf::Vector2f bounds, sf::Vector2f pos, Card card, sf::Font& f)
+    explicit CardShape(sf::Vector2f bounds, sf::Vector2f pos, Card card, sf::Font &f)
         : i_bounds(bounds), i_pos(pos), i_card(card), font(f), label(f, "", 20)
     {
         i_bounds = bounds;
@@ -15,58 +14,37 @@ public:
         is_active = false;
         this->setPosition(i_pos);
         body = sf::RectangleShape(i_bounds);
-        body.setPosition(i_pos);
+        body.setPosition({0, 0});
         label = sf::Text(f, "", 20);
         label.setFillColor(sf::Color::Transparent);
         init_quadrants();
-        update();
     }
 
     void init_quadrants()
     {
-        sf::Vector2f middle = {getPos().x + getBounds().x / 2, getPos().y + getBounds().y / 2};
+        sf::Vector2f middle = {getBounds().x / 2, getBounds().y / 2};
         for (int i = 0; i < 4; i++)
         {
             sf::RectangleShape overlay({getBounds().x / 2, getBounds().y / 2});
             quadrants[i] = overlay;
             quadrants[i].setFillColor(sf::Color::Transparent);
         }
-        quadrants[0].setPosition(this->getPosition());
-        quadrants[1].setPosition({middle.x, this->getPosition().y});
-        quadrants[2].setPosition({this->getPosition().x, middle.y});
+        quadrants[0].setPosition({0, 0});
+        quadrants[1].setPosition({middle.x, 0});
+        quadrants[2].setPosition({0, middle.y});
         quadrants[3].setPosition(middle);
-    }
-
-    std::size_t getPointCount() const override
-    {
-        return 4;
-    }
-
-    sf::Vector2f getPoint(std::size_t index) const override
-    {
-        switch (index)
-        {
-        case 0:
-            return {0, 0};
-        case 1:
-            return {i_bounds.x, 0};
-        case 2:
-            return {i_bounds.x, i_bounds.y};
-        case 3:
-            return {0, i_bounds.y};
-        }
-        return {};
     }
 
     int getQuadrant(sf::Vector2f mousePos)
     {
-        if (!getGlobalBounds().contains(mousePos) || !is_active)
+        mousePos = getInverseTransform().transformPoint(mousePos);
+        if (!body.getGlobalBounds().contains(mousePos) || !is_active)
         {
             // Not in the card or card inactive
             return -1;
         }
         // Get middle point
-        sf::Vector2f middle = {getPos().x + getBounds().x / 2, getPos().y + getBounds().y / 2};
+        sf::Vector2f middle = {getBounds().x / 2, getBounds().y / 2};
 
         // Get quadrant, if the user clicked exactly middle point default to quad 1
         if (mousePos.x <= middle.x && mousePos.y <= middle.y)
@@ -92,7 +70,6 @@ public:
     {
         i_bounds = bounds;
         this->body.setSize(bounds);
-        update();
     }
 
     void setPos(sf::Vector2f pos)
@@ -100,8 +77,8 @@ public:
         i_pos = pos;
         this->setPosition(i_pos);
         init_quadrants();
-        this->body.setPosition(pos);
-        update();
+        this->body.setPosition({0, 0});
+        this->label.setPosition({0, 0});
     }
 
     void setCard(Card card)
@@ -131,6 +108,7 @@ public:
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override
     {
+        states.transform *= getTransform();
         target.draw(body, states);
         for (int i = 0; i < 4; i++)
         {
@@ -159,8 +137,8 @@ public:
             sf::FloatRect textBounds = label.getLocalBounds();
             label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
                              textBounds.position.y + textBounds.size.y / 2});
-            float y_mid = quadrants[0].getPosition().y + quadrants[0].getSize().y / 2;
-            label.setPosition({getPos().x + getBounds().x / 2, y_mid});
+            float y_mid = quadrants[0].getSize().y / 2;
+            label.setPosition({getBounds().x / 2, y_mid});
             label.setFillColor(sf::Color::White);
         }
     }
@@ -174,8 +152,8 @@ public:
             sf::FloatRect textBounds = label.getLocalBounds();
             label.setOrigin({textBounds.position.x + textBounds.size.x / 2,
                              textBounds.position.y + textBounds.size.y / 2});
-            float y_mid = quadrants[2].getPosition().y + quadrants[2].getSize().y / 2;
-            label.setPosition({getPos().x + getBounds().x / 2, y_mid});
+            float y_mid = getBounds().y / 2 + quadrants[2].getSize().y / 2;
+            label.setPosition({getBounds().x / 2, y_mid});
             label.setString(text);
             label.setFillColor(sf::Color::White);
         }
@@ -210,7 +188,8 @@ public:
         label.setFillColor(sf::Color::Transparent);
     }
 
-    void set_is_active(bool b) {
+    void set_is_active(bool b)
+    {
         is_active = b;
     }
 
@@ -224,5 +203,5 @@ private:
     sf::RectangleShape body;
     sf::RectangleShape quadrants[4];
     sf::Text label;
-    sf::Font& font;
+    sf::Font &font;
 };

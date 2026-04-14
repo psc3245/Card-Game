@@ -302,22 +302,20 @@ Ready to play?)";
                 switch (getPlayerSeat(i))
                 {
                 case 0:
-                    all_hands[i][j].setPos({285.f + (110.f * j), 570.f});
+                    all_hands[i][j].setPos({285.f + (110.f * j), 600.f});
                     break;
                 case 1:
-                    b = all_hands[i][j].getLocalBounds();
-                    all_hands[i][j].setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
-                    all_hands[i][j].setPos({840.f, 200.f + (110.f * j)});
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({900.f, 200.f + (110.f * j)});
                     all_hands[i][j].setRotation(ninety_degree_rotation);
                     break;
                 case 2:
-                    b = all_hands[i][j].getLocalBounds();
-                    all_hands[i][j].setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
-                    all_hands[i][j].setPos({140.f, 200.f + (110.f * j)});
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({100.f, 200.f + (110.f * j)});
                     all_hands[i][j].setRotation(ninety_degree_rotation);
                     break;
                 case 3:
-                    all_hands[i][j].setPos({285.f + (110.f * j), 40.f});
+                    all_hands[i][j].setPos({285.f + (110.f * j), 10.f});
                     break;
                 }
             }
