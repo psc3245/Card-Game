@@ -84,6 +84,8 @@ Ready to play?)";
                 all_hands[i][j].set_is_active(false);
             }
         }
+
+        setSeatPositions();
     }
 
     SceneType handleEvent(const sf::Event &event) override
@@ -230,7 +232,7 @@ Ready to play?)";
         resultLabel.setFillColor(sf::Color::Black);
 
         goButton.setFillColor(sf::Color::Red);
-        
+
         all_hands[prevTurn][prevStage].set_is_active(false);
         all_hands[prevTurn][prevStage].unhighlight();
         all_hands[game.getTurn()][game.getStage()].set_is_active(true);
@@ -281,6 +283,45 @@ Ready to play?)";
         }
     }
 
+    // offset 0 → bottom
+    // offset 1 → right
+    // offset 2 → left
+    // offset 3 → top
+    int getPlayerSeat(int i)
+    {
+        return (i - game.getTurn() + game.getNumPlayers()) % game.getNumPlayers();
+    }
+
+    void setSeatPositions()
+    {
+        sf::FloatRect b;
+        for (int i = 0; i < game.getNumPlayers(); i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                switch (getPlayerSeat(i))
+                {
+                case 0:
+                    all_hands[i][j].setPos({285.f + (110.f * j), 600.f});
+                    break;
+                case 1:
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({900.f, 200.f + (110.f * j)});
+                    all_hands[i][j].setRotation(ninety_degree_rotation);
+                    break;
+                case 2:
+                    all_hands[i][j].setOrigin({all_hands[i][j].getBounds().x / 2, all_hands[i][j].getBounds().y / 2});
+                    all_hands[i][j].setPos({100.f, 200.f + (110.f * j)});
+                    all_hands[i][j].setRotation(ninety_degree_rotation);
+                    break;
+                case 3:
+                    all_hands[i][j].setPos({285.f + (110.f * j), 10.f});
+                    break;
+                }
+            }
+        }
+    }
+
 private:
     // Game Model
     RideTheBus game;
@@ -315,4 +356,6 @@ private:
     const std::string stage_2_instructions = R"(Second round - guess if the next card will be higher or lower than the last card)";
     const std::string stage_3_instructions = R"(Third round - guess if the next card will be inbetween or outside the previous two cards)";
     const std::string stage_4_instructions = R"(Fourth round - guess the suit of the final card)";
+
+    const sf::Angle ninety_degree_rotation = sf::degrees(90.f);
 };
