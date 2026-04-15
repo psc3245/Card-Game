@@ -37,14 +37,16 @@ public:
 
     int getQuadrant(sf::Vector2f mousePos)
     {
-        mousePos = getInverseTransform().transformPoint(mousePos);
-        if (!body.getGlobalBounds().contains(mousePos) || !is_active)
-        {
-            // Not in the card or card inactive
+        if (!is_active)
             return -1;
-        }
-        // Get middle point
-        sf::Vector2f middle = {getBounds().x / 2, getBounds().y / 2};
+
+        sf::Vector2f worldPos = getTransform().transformPoint({0, 0});
+        sf::FloatRect worldBounds({worldPos.x, worldPos.y}, {i_bounds.x, i_bounds.y});
+
+        if (!worldBounds.contains(mousePos))
+            return -1;
+
+        sf::Vector2f middle = {worldPos.x + i_bounds.x / 2, worldPos.y + i_bounds.y / 2};
 
         // Get quadrant, if the user clicked exactly middle point default to quad 1
         if (mousePos.x <= middle.x && mousePos.y <= middle.y)
@@ -55,7 +57,7 @@ public:
         {
             return 1;
         }
-        if (mousePos.x < middle.x && mousePos.y > middle.y)
+        if (mousePos.x <= middle.x && mousePos.y > middle.y)
         {
             return 2;
         }

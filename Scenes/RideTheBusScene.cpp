@@ -3,6 +3,7 @@
 #include "RideTheBus.cpp"
 #include "CardShape.cpp"
 #include <map>
+#include "util.cpp"
 
 class RideTheBusScene : public Scene
 {
@@ -26,7 +27,7 @@ public:
 You may give or receieve drinks based on if you are correct or not. 
 Be careful, if the choice is impossible, it's double drinks for you.
 Ready to play?)";
-        instructions.setString(instructions_text);
+        instructions.setString(wrapText(instructions_text, 600, instructions));
         b = instructions.getLocalBounds();
         instructions.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
         instructions.setPosition({500.f, 150.f});
@@ -47,7 +48,7 @@ Ready to play?)";
         resultLabel.setFillColor(sf::Color::Transparent);
         b = resultLabel.getLocalBounds();
         resultLabel.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
-        resultLabel.setPosition({500.f, 300.f});
+        resultLabel.setPosition({500.f, 480.f});
 
         turn_label.setStyle(sf::Text::Bold);
         turn_label.setFillColor(sf::Color::Black);
@@ -161,10 +162,12 @@ Ready to play?)";
                 {
                     if (isPregame)
                         isPregame = false;
-                    instructions.setPosition({500.f, 300.f});
-                    instructions.setString(getInstructionsForRound());
+                    instructions.setPosition({650.f, 300.f});
+                    instructions.setString(wrapText(getInstructionsForRound(), 600, instructions));
                     isRoundActive = true;
                     all_hands[game.getTurn()][game.getStage()].set_is_active(true);
+                    std::string turn_string = "Player " + std::to_string(game.getTurn() + 1) + "'s Turn:";
+                    turn_label.setString(turn_string);
                     setSeatPositions();
                 }
                 return SceneType::NONE;
@@ -178,21 +181,21 @@ Ready to play?)";
             int prevStage = game.getStage();
             if (game.getStage() == 0)
             {
-                if (quad == 0 || quad == 2)
+                if (quad < 2)
                     last_result = game.submitGuess('r');
                 else
                     last_result = game.submitGuess('b');
             }
             else if (game.getStage() == 1)
             {
-                if (quad == 0 || quad == 2)
+                if (quad < 2)
                     last_result = game.submitGuess('h');
                 else
                     last_result = game.submitGuess('l');
             }
             else if (game.getStage() == 2)
             {
-                if (quad == 0 || quad == 2)
+                if (quad < 2)
                     last_result = game.submitGuess('o');
                 else
                     last_result = game.submitGuess('i');
@@ -233,6 +236,8 @@ Ready to play?)";
             resultLabel.setString("Yikes! Double drinks! Take " + std::to_string((prevStage + 1) * 4) + " drinks!");
         }
         resultLabel.setFillColor(sf::Color::Black);
+        sf::FloatRect b = resultLabel.getLocalBounds();
+        resultLabel.setOrigin({b.position.x + b.size.x / 2, b.position.y + b.size.y / 2});
 
         goButton.setFillColor(sf::Color::Red);
 
@@ -244,7 +249,6 @@ Ready to play?)";
 
     void draw(sf::RenderWindow &window) override
     {
-        window.draw(instructions);
         if (!isRoundActive)
         {
             window.draw(goButton);
@@ -252,10 +256,15 @@ Ready to play?)";
         }
         if (!isPregame)
         {
-            instructions.setCharacterSize(25);
-            instructions.setPosition({500, 375.f});
-            window.draw(resultLabel);
-            window.draw(turn_label);
+            if (isRoundActive)
+            {
+                instructions.setCharacterSize(25);
+                instructions.setPosition({500, 375.f});
+                window.draw(instructions);
+                window.draw(turn_label);
+            }
+            else
+                window.draw(resultLabel);
             for (int i = 0; i < game.getNumPlayers(); i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -265,7 +274,10 @@ Ready to play?)";
             }
         }
         else
+        {
             window.draw(header);
+            window.draw(instructions);
+        }
     }
 
     void setNumPlayers(int n)
@@ -290,6 +302,7 @@ Ready to play?)";
             return stage_4_instructions;
             break;
         }
+        return "";
     }
 
     // offset 0 → bottom
