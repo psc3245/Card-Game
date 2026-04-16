@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include "RideTheBusScene.cpp"
-#include "MainMenuScene.cpp"
+#include "Scenes/RideTheBusScene.cpp"
+#include "Scenes/MainMenuScene.cpp"
 
 int main()
 {
