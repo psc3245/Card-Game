@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include "Scenes/RideTheBusScene.cpp"
-#include "Scenes/MainMenuScene.cpp"
+#include "RideTheBusScene.cpp"
+#include "MainMenuScene.cpp"
+#include "RideTheBusAloneScene.cpp"
 
 int main()
 {
@@ -20,8 +21,8 @@ int main()
             if (next == SceneType::RIDE_THE_BUS)
             {
                 int players = static_cast<MainMenuScene *>(currentScene)->getNumPlayers();
-                printf("players: %d\n", players); fflush(stdout);
-                currentScene = new RideTheBusScene(window, font, players);
+                if (players == 1) currentScene = new RideTheBusAloneScene(window, font);
+                else currentScene = new RideTheBusScene(window, font, players);
             }
             else if (next == SceneType::MAIN_MENU)
                 currentScene = mainMenuScene;
