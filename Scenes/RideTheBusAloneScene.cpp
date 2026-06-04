@@ -66,13 +66,7 @@ public:
             }
         }
 
-        cards = std::vector<CardShape>(4);
-
-        for (int i = 0; i < 4; i++)
-        {
-            cards[i].setOrigin({cards[i].getBounds().x / 2, cards[i].getBounds().y / 2});
-            cards[i].setPos({330.f + (110.f * i), 640.f});
-        }
+        RideTheBusAlone game();
     }
     SceneType handleEvent(const sf::Event &event)
     {
