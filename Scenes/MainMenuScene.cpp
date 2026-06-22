@@ -52,7 +52,6 @@ public:
                 if (which != -1)
                 {
                     setNumPlayers(which + 1);
-                    // need logic to determine which button was pressed but for now we only have one
                     return buttonsMap[i];
                 }
             }

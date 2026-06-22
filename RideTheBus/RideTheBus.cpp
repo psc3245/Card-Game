@@ -2,16 +2,9 @@
 #include <iostream>
 #include <ctime>
 #include "Deck.cpp"
+#include "util.cpp"
 
 using namespace std;
-
-enum round_outcome
-{
-    TBD,
-    CORRECT,
-    WRONG,
-    DOUBLE
-};
 
 class RideTheBus
 {
@@ -39,6 +32,7 @@ public:
 
     round_outcome submitGuess(char choice)
     {
+        // printf("Choice: %c \n", choice);
         round_outcome result;
         switch (stage)
         {
@@ -62,15 +56,15 @@ public:
             // game is over
             break;
         }
-        turn ++;
-        if (turn == numPlayers) {
+        turn++;
+        if (turn == numPlayers)
+        {
             turn = 0;
-            stage ++;
+            stage++;
         }
+        // cout << "Result: " << (int)result << endl;
         return result;
     }
-
-    
 
     Card *getHand(int player)
     {
@@ -107,23 +101,9 @@ private:
     Deck deck;
     Card **hands;
 
-    int map_hand_value(char val)
-    {
-        if (val == 'A')
-            return 14;
-        if (val == 'K')
-            return 13;
-        if (val == 'Q')
-            return 12;
-        if (val == 'J')
-            return 11;
-        if (val == 'T')
-            return 10;
-        return val - '0';
-    }
-
     round_outcome handle_round_1(char choice)
     {
+        // printf("Card: %c %c\n", hands[turn][0].getSuit(), hands[turn][0].getVal());
         char color;
         if (hands[turn][0].getSuit() == 'H' || hands[turn][0].getSuit() == 'D')
         {
@@ -131,7 +111,7 @@ private:
         }
         else
         {
-            color = 'd';
+            color = 'b';
         }
         if (color == choice)
         {
@@ -145,6 +125,9 @@ private:
 
     round_outcome handle_round_2(char choice)
     {
+        // printf("First Card: %c %c ", hands[turn][0].getSuit(), hands[turn][0].getVal());
+        // printf("Second Card: %c %c\n", hands[turn][1].getSuit(), hands[turn][1].getVal());
+
         int prev = map_hand_value(hands[turn][0].getVal());
         int curr = map_hand_value(hands[turn][1].getVal());
         if (curr == prev)
@@ -160,6 +143,10 @@ private:
 
     round_outcome handle_round_3(char choice)
     {
+        // printf("First Card: %c %c ", hands[turn][0].getSuit(), hands[turn][0].getVal());
+        // printf("Second Card: %c %c ", hands[turn][1].getSuit(), hands[turn][1].getVal());
+        // printf("Second Card: %c %c\n", hands[turn][2].getSuit(), hands[turn][2].getVal());
+
         int first = map_hand_value(hands[turn][0].getVal());
         int second = map_hand_value(hands[turn][1].getVal());
         int third = map_hand_value(hands[turn][2].getVal());
@@ -182,6 +169,8 @@ private:
 
     round_outcome handle_round_4(char choice)
     {
+        // printf("Card: %c %c\n", hands[turn][3].getSuit(), hands[turn][3].getVal());
+
         if (choice == std::tolower(hands[turn][3].getSuit()))
             return CORRECT;
         return WRONG;
